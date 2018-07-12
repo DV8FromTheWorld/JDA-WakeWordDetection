@@ -1,0 +1,11 @@
+FFmpeg version SVN-r25512, Copyright (c) 2000-2010 the FFmpeg developers
+  built on Oct 18 2010 04:06:45 with gcc 4.4.2
+  configuration: --enable-gpl --enable-version3 --enable-libgsm --enable-pthreads --enable-libvorbis --enable-libtheora --enable-libspeex --enable-libmp3lame --enable-libopenjpeg --enable-libschroedinger --enable-libopencore_amrwb --enable-libopencore_amrnb --enable-libvpx --arch=x86 --enable-runtime-cpudetect --enable-libxvid --enable-libx264 --extra-libs='-lx264 -lpthread' --enable-librtmp --extra-libs='-lrtmp -lpolarssl -lws2_32 -lwinmm' --target-os=mingw32 --enable-avisynth --cross-prefix=i686-mingw32- --cc='ccache i686-mingw32-gcc' --enable-memalign-hack
+  libavutil     50.32. 3 / 50.32. 3
+  libavcore      0. 9. 1 /  0. 9. 1
+  libavcodec    52.92. 0 / 52.92. 0
+  libavformat   52.83. 0 / 52.83. 0
+  libavdevice   52. 2. 2 / 52. 2. 2
+  libavfilter    1.52. 0 /  1.52. 0
+  libswscale     0.12. 0 /  0.12. 0
+https://cdn.notfab.net/Recording.wav: No such file or directory
