@@ -20,7 +20,7 @@ public class Start {
         }
         recognizer.stopRecognition();*/
         //        new VoiceBot();
-        new VoiceReceiveHandler();
+//        new VoiceReceiveHandler();
     }
 
 }

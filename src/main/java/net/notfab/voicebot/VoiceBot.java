@@ -49,7 +49,7 @@ public class VoiceBot extends ListenerAdapter {
         VoiceChannel channel = guild.getVoiceChannelsByName("Helpers Music", true).get(0);
         AudioManager manager = guild.getAudioManager();
 
-        manager.setReceivingHandler(new VoiceReceiveHandler());
+        manager.setReceivingHandler(new VoiceReceiveHandler(event.getChannel()));
         // Here we finally connect to the target voice channel
         // and it will automatically start pulling the audio from the MySendHandler instance
         manager.openAudioConnection(channel);

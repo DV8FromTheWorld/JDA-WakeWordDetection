@@ -5,6 +5,7 @@ import ai.picovoice.porcupine.PorcupineException;
 import net.dv8tion.jda.core.audio.AudioReceiveHandler;
 import net.dv8tion.jda.core.audio.CombinedAudio;
 import net.dv8tion.jda.core.audio.UserAudio;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.utils.IOUtil;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -22,13 +23,17 @@ public class VoiceReceiveHandler implements AudioReceiveHandler {
 
     final String modelFilePath = "C:\\Users\\Austin\\Desktop\\VoiceBot\\Runtime\\porcupine_params.pv"; // It is available at lib/common/porcupine_params.pv
     final String keywordFilePath = "C:\\Users\\Austin\\Desktop\\VoiceBot\\porcupine.ppn";
+//final String keywordFilePath = "C:\\Users\\Austin\\Desktop\\VoiceBot\\Hey_Yui_windows.ppn";
+//    final String keywordFilePath = "C:\\Users\\Austin\\Desktop\\VoiceBot\\Austin_windows.ppn";
     final float sensitivity = 0.5f;
+    final TextChannel chan;
 
 //    private Attributes attributes = DefaultAttributes.WAV_PCM_S16LE_MONO_44KHZ.getAttributes();
 
     Porcupine porcupine;
 
-    public VoiceReceiveHandler() {
+    public VoiceReceiveHandler(TextChannel chan) {
+        this.chan = chan;
         try {
             porcupine = new Porcupine(modelFilePath, keywordFilePath, sensitivity);
             System.out.println(porcupine.getFrameLength());
@@ -54,7 +59,6 @@ public class VoiceReceiveHandler implements AudioReceiveHandler {
         //System.out.println("CombinedAudio");
     }
 
-
     int found = 0;
     int notFound = 0;
     private void setupActiveListener() {
@@ -64,14 +68,25 @@ public class VoiceReceiveHandler implements AudioReceiveHandler {
             byte[] bBuffer = new byte[porcupine.getFrameLength() * 2];
             short[] sBuffer = new short[porcupine.getFrameLength()];
 
-            try {
-                convertedAudio.add(AudioSystem.getAudioInputStream(new File("porcupine.wav")));
-                System.out.println("added");
-            } catch (UnsupportedAudioFileException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                byte[] buffer = new byte[3840 * MAX_PACKETS];
+//                AudioInputStream stream = AudioSystem.getAudioInputStream(new File("porcupine.wav"));
+//                AudioInputStream stream2 = AudioSystem.getAudioInputStream(new File("16bit_16khz_mono.wav"));
+//                System.out.println(stream.getFormat());
+//                System.out.println(stream2.getFormat());
+//                int read = 0;
+//                while ((read = stream.read(buffer)) != -1) {
+//                    convertedAudio.add(new AudioInputStream(new ByteArrayInputStream(buffer), stream.getFormat(), buffer.length));
+//                }
+
+//                convertedAudio.add(stream);
+//                convertedAudio.add(stream2);
+//                System.out.println("added");
+//            } catch (UnsupportedAudioFileException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
             try {
                 while (true) {
@@ -98,6 +113,7 @@ public class VoiceReceiveHandler implements AudioReceiveHandler {
                         ByteBuffer.wrap(bBuffer).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(sBuffer);
                         if (porcupine.processFrame(sBuffer)) {
                             found++;
+                            chan.sendMessage("I heard the wakeword!").queue();
                             System.out.println("Found word! YEEEEEEEEEEEEEEEEEEEEEEES");
                         }
                         else {
@@ -125,41 +141,45 @@ public class VoiceReceiveHandler implements AudioReceiveHandler {
     byte[] buffer = new byte[3840 * MAX_PACKETS]; //200ms of data
     @Override
     public void handleUserAudio(UserAudio userAudio) {
-        if (userAudio.getUser().getName().equals("DV8FromTheWorld")) {
+        if (userAudio.getUser().getName().equals("DV8FromTheWorld")
+            || userAudio.getUser().getName().equals("Yui")) {
             byte[] userAudioBytes = userAudio.getAudioData(1);
-            for (int i = 0; i < 3840; i++) {
-//                buffer[i * currentBuffer] = userAudioBytes[i];
-//                audio.add(userAudioBytes[i]);
-                bb[i * currentCC] = userAudioBytes[i];
-            }
-            currentCC++;
+            //TODO: replace with System.arraycopy
+            System.arraycopy(userAudioBytes, 0, buffer, (currentBuffer * 3840), 3840);
+//            System.arraycopy(userAudioBytes, 0, bb,     (currentCC     * 3840), 3840);
+//            for (int i = 0; i < 3840; i++) {
+//                buffer[i + (3840 * currentBuffer)] = userAudioBytes[i];
+////                audio.add(userAudioBytes[i]);
+////                bb[i + (3840 * currentCC)] = userAudioBytes[i];
+//            }
 
-            if (currentCC >= 99) {
-                try {
-                    System.out.println("Making");
-                    AudioInputStream stream = new AudioInputStream(new ByteArrayInputStream(bb), AudioReceiveHandler.OUTPUT_FORMAT, bb.length / 4);
-                    System.out.println("Converting");
-                    AudioSystem.write(NewStart.toPorcupineAudioStream(stream), AudioFileFormat.Type.WAVE, new File("16bit_16khz_mono.wav"));
-                    System.out.println("Saved");
-                    currentCC = 0;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                audio.clear();
-            }
-
-//            currentBuffer++;
-//            if (currentBuffer >= MAX_PACKETS) {
-//                AudioInputStream stream = new AudioInputStream(new ByteArrayInputStream(buffer), AudioReceiveHandler.OUTPUT_FORMAT, buffer.length / 4);
+//            currentCC++;
+//            if (currentCC >= 99) {
 //                try {
-//                    System.out.println("Made new stream");
-////                    convertedAudio.push(NewStart.toPorcupineAudioStream(stream));
+//                    System.out.println("Making");
+//                    AudioInputStream stream = new AudioInputStream(new ByteArrayInputStream(bb), AudioReceiveHandler.OUTPUT_FORMAT, bb.length);
+//                    System.out.println("Converting");
+//                    AudioSystem.write(stream, AudioFileFormat.Type.WAVE, new File("16bit_16khz_mono.wav"));
+//                    System.out.println("Saved");
+//                    currentCC = 0;
 //                } catch (IOException e) {
 //                    e.printStackTrace();
 //                }
-//
-//                currentBuffer = 0;
+//                audio.clear();
 //            }
+
+            currentBuffer++;
+            if (currentBuffer >= MAX_PACKETS) {
+                AudioInputStream stream = new AudioInputStream(new ByteArrayInputStream(buffer), AudioReceiveHandler.OUTPUT_FORMAT, buffer.length);
+                try {
+                    System.out.println("Made new stream");
+                    convertedAudio.push(NewStart.toPorcupineAudioStream(stream));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                currentBuffer = 0;
+            }
 
 //            for (byte b : userAudioBytes) {
 //                audio.add(b);
